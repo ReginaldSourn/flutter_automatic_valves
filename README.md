@@ -1,6 +1,6 @@
 # vautomatic
 
-Autmotics Valves we solves problems Short ages
+Autmotics Valves we solves problems Shortages Water
 
 ## Getting Started
 
