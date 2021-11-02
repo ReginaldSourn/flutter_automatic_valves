@@ -48,6 +48,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
       return _time;
     }
   }
+
   @override
   void initState() {
     timeinput1Start.text = "";
@@ -58,10 +59,122 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     timeinput3Stop.text = "";//set the initial value of text field
     super.initState();
   }
+  bool checkInput(){
+    if ((timeinput1Start.text.isNotEmpty) && (timeinput1Stop.text.isNotEmpty)
+    && (timeinput2Start.text.isNotEmpty) &&  (timeinput2Stop.text.isNotEmpty) &&
+    (timeinput3Start.text.isNotEmpty) && (timeinput3Stop.text.isNotEmpty)){
+        return true;
+    }
+    else {
+      return false;
+    }
+  }
   String? _selectedTime;
+  @override
+  String getValvesList (bool status, String number, String starttime, String stoptime)  {
+    int starttime_ = int.parse(starttime.substring(0,2))*3600 + int.parse(starttime.substring(3,5))*60;
+    int stoptime_ =  int.parse(stoptime.substring(0,2))*3600 + int.parse(stoptime.substring(3,5))*60;
+    int minuteinterval;
+    String intervalhour, intervalminute;
+    if (status) {
+      if (starttime_ > stoptime_) {
+        intervalhour =
+            (((stoptime_ + 86400) - (starttime_)) / 3600).toInt().toString();
+        minuteinterval =
+            ((((stoptime_ + 86400) - (starttime_)) % 3600) / 60).toInt();
+        if (minuteinterval > 60) {
+          intervalminute = ((minuteinterval % 60) - 20).toString();
+        }
+        else {
+          intervalminute = minuteinterval.toString();
+        }
+      }
+      else {
+        intervalhour = (((stoptime_) - (starttime_)) / 3600).toInt().toString();
+        intervalminute =
+            ((((stoptime_) - (starttime_)) % 3600) / 60).toInt().toString();
+        // if (minuteinterval > 60){
+        //   intervalminute = ((minuteinterval % 60)-20).toString();
+        // }
+        // else{
+        //   intervalminute = minuteinterval.toString();
+        // }
+      }
+      return " កំណត់វា៉ល់ " + number + ": ចាប់ពីម៉ោង " + starttime +
+          " រហូតដល់ " + stoptime + " មានរយះពេល " + intervalhour + " ម៉ោង " +
+          intervalminute + " នាទី ";
+    }
+    else{
+      return " កំណត់វា៉ល់ " + number + ": មិនអោយដំណើរការ";
+    }
+    }
 
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('ការកំណត់បានត្រឹមត្រូវ'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children:  <Widget>[
+                Text('បានកំណត់:'),
+                Text("==========================="),
+                Text(getValvesList(statusV1,"1",timeinput1Start.text,timeinput1Stop.text)),
+                Text("==========================="),
+                Text(getValvesList(statusV2,"2",timeinput2Start.text,timeinput2Stop.text)),
+                Text("==========================="),
+                Text(getValvesList(statusV3,"3",timeinput3Start.text,timeinput3Stop.text)),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('មិនទាន់'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('ផ្ងើរការកំណត់'),
+              onPressed: () {
 
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Future<void> errorDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('ការកំណត់មិនត្រឹមត្រូវ'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children:  <Widget>[
 
+                Text('សូមមេត្តាបំពេញ តារាងកំណត់ម៉ោងអោយបានត្រឹមត្រូវ'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('បាទ/ចាស់'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -104,8 +217,8 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
 
               height: 320.0,
               width: 380,
-                margin: EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
+              margin: EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.0),
                   color: Color(0xFF93b75c),
                   boxShadow: [
@@ -257,7 +370,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
 
                             _timeV2Start= await _selectTime() as TimeOfDay;
                             setState(() {
-                              timeinput2Start.text = _timeV2Start.format(context); //set the value of text field.
+                            timeinput2Start.text = _timeV2Start.format(context); //set the value of text field.
                             });
                           },//end async
                         ),),
@@ -281,7 +394,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                           readOnly: true,
                           onTap:() async{
 
-                            _timeV3Stop= await _selectTime() as TimeOfDay;
+                            _timeV2Stop= await _selectTime() as TimeOfDay;
                             setState(() {
                               timeinput2Stop.text = _timeV2Stop.format(context); //set the value of text field.
                             });
@@ -338,7 +451,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
 
                             _timeV3Start= await _selectTime() as TimeOfDay;
                             setState(() {
-                              timeinput3Start.text = _timeV3Start.format(context); //set the value of text field.
+                            timeinput3Start.text = _timeV3Start.format(context); //set the value of text field.
                             });
                           },//end async
                         ),),
@@ -426,8 +539,16 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                         alignment:Alignment.center,
                         child:FloatingActionButton.extended(
 
-                          onPressed: (){
+                          onPressed: (
 
+
+                              ) async {
+                         if (checkInput()){
+                            _showMyDialog();
+                            }
+                         else{
+                           errorDialog();
+                           }
                         },
                           icon: Icon(Icons.save_outlined),
                           label:Text("កំណត់",style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),),),
