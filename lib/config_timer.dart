@@ -2,11 +2,15 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'dart:convert' as convert;
+import 'dart:async';
+import 'package:valves_a/variable.dart' as va;
 import 'package:http/http.dart' as http;
+
+String _status = '';
 
 class CustomDialogBox extends StatefulWidget {
   final String title, descriptions, text;
-
   const CustomDialogBox({Key? key, required this.title, required this.descriptions, required this.text}) : super(key: key);
 
   @override
@@ -33,6 +37,8 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
   TimeOfDay _timeV3Stop = TimeOfDay(hour: 0, minute: 0);
   var selectedTime24Hour;
 
+  late BuildContext scaffoldContext;
+
   //text editing controller for text field
   Future<TimeOfDay?> _selectTime() async {
     final TimeOfDay? newTime = await showTimePicker(
@@ -49,6 +55,17 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     }
   }
 
+  displaySnackBar(BuildContext context, String msg) {
+
+    final snackBar = SnackBar(
+      content: Text(msg),
+      action: SnackBarAction(
+        label: 'Ok',
+        onPressed: () {},
+      ),
+    );
+    Scaffold.of(scaffoldContext).showSnackBar(snackBar);
+  }
   @override
   void initState() {
     timeinput1Start.text = "";
@@ -58,7 +75,10 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     timeinput3Start.text = "";
     timeinput3Stop.text = "";//set the initial value of text field
     super.initState();
+
   }
+
+
   bool checkInput(){
     if ((timeinput1Start.text.isNotEmpty) && (timeinput1Stop.text.isNotEmpty)
     && (timeinput2Start.text.isNotEmpty) &&  (timeinput2Stop.text.isNotEmpty) &&
@@ -107,7 +127,9 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     else{
       return " កំណត់វា៉ល់ " + number + ": មិនអោយដំណើរការ";
     }
+
     }
+
 
   Future<void> _showMyDialog() async {
     return showDialog<void>(
@@ -138,8 +160,9 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
             ),
             TextButton(
               child: const Text('ផ្ងើរការកំណត់'),
-              onPressed: () {
-
+              onPressed: () async {
+                SendConfig();
+                Navigator.of(context).pop();
               },
             ),
           ],
